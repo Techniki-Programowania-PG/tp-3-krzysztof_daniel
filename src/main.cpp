@@ -1,11 +1,15 @@
 #include <pybind11/pybind11.h>
 #include <matplot/matplot.h>
 #include <pybind11/stl.h>
+#include <pybind11/complex.h>
 #include <vector>
 #include <cmath>
+#include <complex>
 
 namespace py = pybind11;
 using namespace matplot;
+
+const double PI = acos(-1);
 
 enum class SignalType {
     Sin,
@@ -54,6 +58,39 @@ std::vector<double> generate_signal(SignalType type, double freq, double samplin
     return signal;
 }
 
+// Funkcja wykonująca DFT
+std::vector<std::complex<double>> DFT(const std::vector<double>& x, bool displayPlot = false) {
+    int N = x.size();
+    std::vector<std::complex<double>> X(N);
+
+    for (int k = 0; k < N; ++k) {
+        std::complex<double> sum(0.0, 0.0);
+        for (int n = 0; n < N; ++n) {
+            double angle = -2 * PI * k * n / N;
+            std::complex<double> expTerm(cos(angle), sin(angle)); // e^{-jω}
+            sum += x[n] * expTerm;
+        }
+        X[k] = sum;
+    }
+
+    if (displayPlot) {
+        std::vector<double> amplitudes;
+        std::vector<double> frequencies;
+
+        for (size_t k = 0; k < X.size(); ++k) {
+            amplitudes.push_back(std::abs(X[k]));
+            frequencies.push_back(static_cast<double>(k));
+        }
+
+        stem(frequencies, amplitudes);
+        xlabel("Częstotliwość");
+        ylabel("Amplituda");
+        title("Wynik DFT");
+        show();
+    }
+
+    return X;
+}
 
 PYBIND11_MODULE(_core, m) {
     m.doc() = R"pbdoc(
@@ -73,7 +110,9 @@ PYBIND11_MODULE(_core, m) {
         .value("Sawtooth", SignalType::Sawtooth)
         .export_values();
 
-    m.def("showSignal", &showSignal, "Rysuje prosty wykres");
+    m.def("showSignal", &showSignal, "Rysuje wykres",
+        py::arg("x"),
+        py::arg("y"));
 
     m.def("generate_signal", &generate_signal,
         py::arg("type"),
@@ -81,6 +120,10 @@ PYBIND11_MODULE(_core, m) {
         py::arg("sampling_rate"),
         py::arg("duration"),
         "Generowanie próbek sygnału (sin, cos, prostokątny, piłokształtny)");
+
+    m.def("DFT", &DFT, "Wylicza DFT podanego sygnału",
+        py::arg("x"),
+        py::arg("show"));
 
 m.attr("__version__") = "dev";
 // #ifdef VERSION_INFO
