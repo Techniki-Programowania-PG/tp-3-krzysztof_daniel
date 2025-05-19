@@ -1,13 +1,17 @@
 #include <pybind11/pybind11.h>
-
-#define STRINGIFY(x) #x
-#define MACRO_STRINGIFY(x) STRINGIFY(x)
-
-float analyze_signal(int i, int j) {
-    return i*j;
-}
+#include <matplot/matplot.h>
 
 namespace py = pybind11;
+using namespace matplot;
+
+void pokaz_wykres() {
+    std::vector<double> x = {1, 2, 3, 4, 5};
+    std::vector<double> y = {1, 4, 9, 16, 25};
+
+    plot(x, y);
+    title("Kwadraty");
+    show();
+}
 
 PYBIND11_MODULE(_core, m) {
     m.doc() = R"pbdoc(
@@ -20,14 +24,12 @@ PYBIND11_MODULE(_core, m) {
            :toctree: _generate
     )pbdoc";
 
-    m.def("analyze_signal", &analyze_signal, R"pbdoc(
-        Multiplies two numbers
-    )pbdoc");
+    m.def("pokaz_wykres", &pokaz_wykres, "Rysuje prosty wykres");
 
-
-#ifdef VERSION_INFO
-    m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
-#else
-    m.attr("__version__") = "dev";
-#endif
+m.attr("__version__") = "dev";
+// #ifdef VERSION_INFO
+//     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
+// #else
+//     m.attr("__version__") = "dev";
+// #endif
 }
