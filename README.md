@@ -35,6 +35,20 @@ chmod +x Miniconda3-latest-Linux-x86_64.sh
 </p>
 </details>
 
+<details><summary><b>MacOS</b></summary>
+<p>
+
+```bash
+xcode-select --install
+brew install cmake git
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh
+chmod +x Miniconda3-latest-MacOSX-arm64.sh
+./Miniconda3-latest-MacOSX-arm64.sh
+```
+
+</p>
+</details>
+
 ## Szablon projektu
 Jako punkt wyjściowy najwygodniej jest pobrać przykład udostępniony przez autorów pybind11:
 
