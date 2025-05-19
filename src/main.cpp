@@ -1,15 +1,15 @@
 #include <pybind11/pybind11.h>
 #include <matplot/matplot.h>
+#include <pybind11/stl.h>
+#include <vector>
 
 namespace py = pybind11;
 using namespace matplot;
 
-void pokaz_wykres() {
-    std::vector<double> x = {1, 2, 3, 4, 5};
-    std::vector<double> y = {1, 4, 9, 16, 25};
+void showSignal(std::vector<double> x, std::vector<double> y) {
 
     plot(x, y);
-    title("Kwadraty");
+    title("Signal");
     show();
 }
 
@@ -24,7 +24,7 @@ PYBIND11_MODULE(_core, m) {
            :toctree: _generate
     )pbdoc";
 
-    m.def("pokaz_wykres", &pokaz_wykres, "Rysuje prosty wykres");
+    m.def("showSignal", &showSignal, "Rysuje prosty wykres");
 
 m.attr("__version__") = "dev";
 // #ifdef VERSION_INFO
