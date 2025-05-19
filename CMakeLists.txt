@@ -1,27 +1,26 @@
-cmake_minimum_required(VERSION 4.0.2)
-cmake_policy(VERSION 4.0.2)
-project(signal-analizer)
+# Require CMake 3.15+ (matching scikit-build-core) Use new versions of all
+# policies up to CMake 3.27
+cmake_minimum_required(VERSION 3.15...3.27)
 
-### DLA WINDOWS
-set(PYTHON_LIBRARY "C:/msys64/ucrt64/lib/libpython3.12.dll.a")
-set(PYTHON_INCLUDE_DIR "C:/msys64/ucrt64/include/python3.12")
+# Scikit-build-core sets these values for you, or you can just hard-code the
+# name and version.
+project(
+  ${SKBUILD_PROJECT_NAME}
+  VERSION ${SKBUILD_PROJECT_VERSION}
+  LANGUAGES CXX)
 
-### Ustawienia do komendy cmake --build .
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/..)
+# Find the module development requirements (requires FindPython from 3.17 or
+# scikit-build-core's built-in backport)
+find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
+find_package(pybind11 CONFIG REQUIRED)
 
-include(FetchContent)
+# Add a library using FindPython's tooling (pybind11 also provides a helper like
+# this)
+python_add_library(_core MODULE src/main.cpp WITH_SOABI)
+target_link_libraries(_core PRIVATE pybind11::headers)
 
-FetchContent_Declare(
-  pybind11
-  GIT_REPOSITORY https://github.com/pybind/pybind11.git
-  GIT_TAG        v2.12
-)
+# This is passing in the version as a define just as an example
+target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
-FetchContent_MakeAvailable(pybind11)
-
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-pybind11_add_module(signal_analyzer src/signal_analyzer.cpp)
-set_target_properties(signal_analyzer PROPERTIES OUTPUT_NAME "signal_analyzer")
-set_target_properties(signal_analyzer PROPERTIES PREFIX "" SUFFIX ".pyd")
+# The install directory is the output (wheel) directory
+install(TARGETS _core DESTINATION signal_analyzer)
