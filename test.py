@@ -4,8 +4,6 @@ import signal_analyzer as sa
 #generowanie sinusa
 y = sa.generate_signal(sa.SignalType.Sin, 3, 500, 1)
 #oś czasu
-x=[]
-for i, el in enumerate(y):
-    x.append(i)
+x=[i for i in range(len(y))]
 
 sa.showSignal(x, y)
