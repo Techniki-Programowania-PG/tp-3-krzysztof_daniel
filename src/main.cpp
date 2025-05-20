@@ -97,6 +97,81 @@ std::vector<std::complex<double>> DFT(const std::vector<double>& x, double sampl
 	return X;
 }
 
+// Funkcja wykonująca FFT (zoptymalizowane DFT)
+std::vector<std::complex<double>> FFT(const std::vector<double>& x_real,
+    double sampling_rate,
+    bool displayPlot = false) {
+    
+    // oryginalna długość
+    size_t N0 = x_real.size();
+    
+    //najbliższa większa potęga dwójki
+    size_t N = 1;
+    while (N < N0) N <<= 1;
+    
+    // wektor zespolony z dopełnieniem zerami
+    std::vector<std::complex<double>> x(N);
+    for (size_t i = 0; i < N0; ++i)
+        x[i] = x_real[i];
+    for (size_t i = N0; i < N; ++i)
+        x[i] = 0;
+    
+    // N jest potęgą dwójki, wykonaj FFT na x[0..N-1]
+    int levels = 0;
+    while ((1u << levels) < N) ++levels;
+    
+    // tablica indeksów w odwrotnej kolejności bitowej
+    std::vector<int> rev(N);
+    rev[0] = 0;
+    for (int i = 1; i < (int)N; ++i) {
+        rev[i] = (rev[i >> 1] >> 1) | ((i & 1) << (levels - 1));
+    }
+    
+    // dane do nowej kolejności
+    std::vector<std::complex<double>> a(N);
+    for (int i = 0; i < (int)N; ++i) {
+        a[i] = x[rev[i]];
+    }
+    
+    // algorytm Cooleya–Tukeya (operacje w miejscu)
+    for (int size = 2; size <= (int)N; size <<= 1) {
+        double angle = -2 * M_PI / size;
+        std::complex<double> wlen(std::cos(angle), std::sin(angle));
+        for (int start = 0; start < (int)N; start += size) {
+            std::complex<double> w(1.0, 0.0);
+            for (int j = 0; j < size/2; ++j) {
+                auto u = a[start + j];
+                auto v = a[start + j + size/2] * w;
+                a[start + j] = u + v;
+                a[start + j + size/2] = u - v;
+                w *= wlen;
+            }
+        }
+    }
+    
+    if (displayPlot) {
+        std::vector<double> amplitudes(N), frequencies(N);
+        int half_N = N / 2;
+        for (int k = 0; k < N; ++k) {
+            amplitudes[k] = std::abs(a[k]);
+        }
+        // przesuń częstotliwość zerową do środka wykresu
+        std::rotate(amplitudes.begin(), amplitudes.begin() + half_N, amplitudes.end());
+        for (int k = 0; k < N; ++k) {
+            frequencies[k] = (k - half_N) * sampling_rate / N;
+        }
+        stem(frequencies, amplitudes);
+        xlabel("Częstotliwość [Hz]");
+        ylabel("Amplituda");
+        title("Wynik FFT (Oś -Fs/2 do Fs/2)");
+        show();
+    }
+    
+    return a;
+}
+
+    
+
 PYBIND11_MODULE(_core, m) {
     m.doc() = R"pbdoc(
         Pybind11 example plugin
@@ -130,6 +205,11 @@ PYBIND11_MODULE(_core, m) {
         py::arg("x"),
         py::arg("sampling_rate"),
         py::arg("show"));
+
+    m.def("FFT", &FFT, "Compute FFT of a real-valued signal (power-of-2 length)",
+        py::arg("x"),
+        py::arg("sampling_rate"),
+        py::arg("show") = false);
 
 m.attr("__version__") = "dev";
 // #ifdef VERSION_INFO

@@ -36,3 +36,4 @@ build
 venv
 .venv
 .vscode
+.DS_store
