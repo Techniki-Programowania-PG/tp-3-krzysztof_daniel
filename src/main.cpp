@@ -5,6 +5,7 @@
 #include <vector>
 #include <cmath>
 #include <complex>
+#include <algorithm>
 
 namespace py = pybind11;
 using namespace matplot;
@@ -59,37 +60,41 @@ std::vector<double> generate_signal(SignalType type, double freq, double samplin
 }
 
 // Funkcja wykonująca DFT
-std::vector<std::complex<double>> DFT(const std::vector<double>& x, bool displayPlot = false) {
-    int N = x.size();
-    std::vector<std::complex<double>> X(N);
+std::vector<std::complex<double>> DFT(const std::vector<double>& x, double sampling_rate, bool displayPlot = false) {
+	int N = x.size();
+	std::vector<std::complex<double>> X(N);
+	for (int k = 0; k < N; ++k) {
+		std::complex<double> sum(0.0, 0.0);
+		for (int n = 0; n < N; ++n) {
+			double angle = -2 * PI * k * n / N;
+			std::complex<double> expTerm(cos(angle), sin(angle));
+			sum += x[n] * expTerm;
+		}
+		X[k] = sum;
+	}
+	if (displayPlot) {
+		std::vector<double> amplitudes(N);
+		std::vector<double> frequencies(N);
+		int half_N = N / 2;
+		for (int k = 0; k < N; ++k) {
+			amplitudes[k] = std::abs(X[k]);
+		}
+		// Przesunięcie FFT: przesuń drugą połowę na początek
+		std::rotate(amplitudes.begin(), amplitudes.begin() + half_N, amplitudes.end());
+		for (int k = 0; k < N; ++k) {
+			// Oś częstotliwości: od -Fs/2 do Fs/2
+			frequencies[k] = ((double)k - half_N) * sampling_rate / N;
+		}
+		// Wykres
+		stem(frequencies, amplitudes);
+		xlabel("Częstotliwość [Hz]");
+		ylabel("Amplituda");
+		title("Wynik DFT (Oś -Fs/2 do Fs/2)2)");
+		show();
+	}
 
-    for (int k = 0; k < N; ++k) {
-        std::complex<double> sum(0.0, 0.0);
-        for (int n = 0; n < N; ++n) {
-            double angle = -2 * PI * k * n / N;
-            std::complex<double> expTerm(cos(angle), sin(angle)); // e^{-jω}
-            sum += x[n] * expTerm;
-        }
-        X[k] = sum;
-    }
 
-    if (displayPlot) {
-        std::vector<double> amplitudes;
-        std::vector<double> frequencies;
-
-        for (size_t k = 0; k < X.size(); ++k) {
-            amplitudes.push_back(std::abs(X[k]));
-            frequencies.push_back(static_cast<double>(k));
-        }
-
-        stem(frequencies, amplitudes);
-        xlabel("Częstotliwość");
-        ylabel("Amplituda");
-        title("Wynik DFT");
-        show();
-    }
-
-    return X;
+	return X;
 }
 
 PYBIND11_MODULE(_core, m) {
@@ -123,6 +128,7 @@ PYBIND11_MODULE(_core, m) {
 
     m.def("DFT", &DFT, "Wylicza DFT podanego sygnału",
         py::arg("x"),
+        py::arg("sampling_rate"),
         py::arg("show"));
 
 m.attr("__version__") = "dev";
