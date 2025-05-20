@@ -6,6 +6,7 @@
 #include <cmath>
 #include <complex>
 #include <algorithm>
+#include <string>
 
 namespace py = pybind11;
 using namespace matplot;
@@ -19,10 +20,33 @@ enum class SignalType {
     Sawtooth
 };
 
-void showSignal(std::vector<double> x, std::vector<double> y) {
-
+void showSimpleSignal(std::vector<double> x, std::vector<double> y) {
     plot(x, y);
     title("Signal");
+    xlabel("X");
+    ylabel("Y");
+    show();
+}
+
+void showComplexSignal(std::vector<std::complex<double>> signal, double sampling_rate, std::string plotTitle, std::string xLabel, std::string yLabel){
+    int N = signal.size();
+    std::vector<double> amplitudes(N);
+    std::vector<double> frequencies(N);
+    int half_N = N / 2;
+    for (int k = 0; k < N; ++k) {
+        amplitudes[k] = std::abs(signal[k]);
+    }
+    // Przesunięcie DFT: przesuń drugą połowę na początek
+    std::rotate(amplitudes.begin(), amplitudes.begin() + half_N, amplitudes.end());
+    for (int k = 0; k < N; ++k) {
+        // Oś częstotliwości: od -Fs/2 do Fs/2
+        frequencies[k] = ((double)k - half_N) * sampling_rate / N;
+    }
+    // Wykres
+    stem(frequencies, amplitudes);
+    xlabel(xLabel);
+    ylabel(yLabel);
+    title(plotTitle);
     show();
 }
     
@@ -73,26 +97,8 @@ std::vector<std::complex<double>> DFT(const std::vector<double>& x, double sampl
 		X[k] = sum;
 	}
 	if (displayPlot) {
-		std::vector<double> amplitudes(N);
-		std::vector<double> frequencies(N);
-		int half_N = N / 2;
-		for (int k = 0; k < N; ++k) {
-			amplitudes[k] = std::abs(X[k]);
-		}
-		// Przesunięcie DFT: przesuń drugą połowę na początek
-		std::rotate(amplitudes.begin(), amplitudes.begin() + half_N, amplitudes.end());
-		for (int k = 0; k < N; ++k) {
-			// Oś częstotliwości: od -Fs/2 do Fs/2
-			frequencies[k] = ((double)k - half_N) * sampling_rate / N;
-		}
-		// Wykres
-		stem(frequencies, amplitudes);
-		xlabel("Częstotliwość [Hz]");
-		ylabel("Amplituda");
-		title("Wynik DFT (Oś -Fs/2 do Fs/2)2)");
-		show();
+		showComplexSignal(X, sampling_rate, "Wynik DFT (Oś -Fs/2 do Fs/2)", "Częstotliwość [Hz]", "Amplituda");
 	}
-
 
 	return X;
 }
@@ -150,27 +156,11 @@ std::vector<std::complex<double>> FFT(const std::vector<double>& x_real,
     }
     
     if (displayPlot) {
-        std::vector<double> amplitudes(N), frequencies(N);
-        int half_N = N / 2;
-        for (int k = 0; k < N; ++k) {
-            amplitudes[k] = std::abs(a[k]);
-        }
-        // przesuń częstotliwość zerową do środka wykresu
-        std::rotate(amplitudes.begin(), amplitudes.begin() + half_N, amplitudes.end());
-        for (int k = 0; k < N; ++k) {
-            frequencies[k] = (k - half_N) * sampling_rate / N;
-        }
-        stem(frequencies, amplitudes);
-        xlabel("Częstotliwość [Hz]");
-        ylabel("Amplituda");
-        title("Wynik FFT (Oś -Fs/2 do Fs/2)");
-        show();
-    }
+		showComplexSignal(a, sampling_rate, "Wynik FFT (Oś -Fs/2 do Fs/2)", "Częstotliwość [Hz]", "Amplituda");
+	}
     
     return a;
 }
-
-    
 
 PYBIND11_MODULE(_core, m) {
     m.doc() = R"pbdoc(
@@ -190,7 +180,7 @@ PYBIND11_MODULE(_core, m) {
         .value("Sawtooth", SignalType::Sawtooth)
         .export_values();
 
-    m.def("showSignal", &showSignal, "Rysuje wykres",
+    m.def("showSimpleSignal", &showSimpleSignal, "Rysuje wykres sygnału podanego w postaci x y",
         py::arg("x"),
         py::arg("y"));
 
@@ -204,14 +194,21 @@ PYBIND11_MODULE(_core, m) {
     m.def("DFT", &DFT, "Wylicza DFT podanego sygnału",
         py::arg("x"),
         py::arg("sampling_rate"),
-        py::arg("show"));
+        py::arg("show") = false);
 
     m.def("FFT", &FFT, "Compute FFT of a real-valued signal (power-of-2 length)",
         py::arg("x"),
         py::arg("sampling_rate"),
         py::arg("show") = false);
+    
+    m.def("showComplexSignal", &showComplexSignal, "Rysuje wykres sygnału podanego w postaci zespolonej",
+        py::arg("signal"),
+        py::arg("sampling_rate"),
+        py::arg("plotTitle") = "Signal",
+        py::arg("xLabel") = "X",
+        py::arg("yLabel") = "Y");
 
-m.attr("__version__") = "dev";
+    m.attr("__version__") = "dev";
 // #ifdef VERSION_INFO
 //     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
 // #else
