@@ -79,7 +79,7 @@ std::vector<std::complex<double>> DFT(const std::vector<double>& x, double sampl
 		for (int k = 0; k < N; ++k) {
 			amplitudes[k] = std::abs(X[k]);
 		}
-		// Przesunięcie FFT: przesuń drugą połowę na początek
+		// Przesunięcie DFT: przesuń drugą połowę na początek
 		std::rotate(amplitudes.begin(), amplitudes.begin() + half_N, amplitudes.end());
 		for (int k = 0; k < N; ++k) {
 			// Oś częstotliwości: od -Fs/2 do Fs/2
