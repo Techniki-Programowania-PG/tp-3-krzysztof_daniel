@@ -162,6 +162,85 @@ std::vector<std::complex<double>> FFT(const std::vector<double>& x_real,
     return a;
 }
 
+// Filtracja 1D: prosta konwolucja sygnału z jądrem
+std::vector<double> filter1D(const std::vector<double>& signal,
+const std::vector<double>& kernel,
+bool circular = false) {
+    int N = (int)signal.size();
+    int M = (int)kernel.size();
+    int half = M / 2;
+    std::vector<double> out(N, 0.0);
+
+    for (int i = 0; i < N; ++i) {
+        double sum = 0.0;
+        for (int k = 0; k < M; ++k) {
+            int idx = i + (k - half);
+            if (circular) {
+                // modulo
+                idx = (idx % N + N) % N;
+            }
+            if (idx >= 0 && idx < N) {
+                sum += signal[idx] * kernel[k];
+            }
+        }
+        out[i] = sum;
+    }
+    return out;
+}
+
+// Filtracja 2D: konwolucja macierzy z jądrem
+std::vector<std::vector<double>> filter2D(
+const std::vector<std::vector<double>>& image,
+const std::vector<std::vector<double>>& kernel,
+bool circular = false)
+{
+    int H = (int)image.size();
+    int W = H ? (int)image[0].size() : 0;
+    int Mh = (int)kernel.size();
+    int Mw = Mh ? (int)kernel[0].size() : 0;
+    int h2 = Mh/2, w2 = Mw/2;
+
+    // wynikowa macierz tej samej wielkości
+    std::vector<std::vector<double>> out(H, std::vector<double>(W, 0.0));
+
+    for (int i = 0; i < H; ++i) {
+        for (int j = 0; j < W; ++j) {
+            double sum = 0.0;
+            for (int u = 0; u < Mh; ++u) {
+                for (int v = 0; v < Mw; ++v) {
+                    int ii = i + (u - h2);
+                    int jj = j + (v - w2);
+                    if (circular) {
+                        ii = (ii % H + H) % H;
+                        jj = (jj % W + W) % W;
+                    }
+                    if (ii >= 0 && ii < H && jj >= 0 && jj < W) {
+                        sum += image[ii][jj] * kernel[u][v];
+                    }
+                }
+            }
+            out[i][j] = sum;
+        }
+    }
+    return out;
+}
+
+// Wizualizacja macierzy 2D
+void showImage(const std::vector<std::vector<double>>& image,
+std::string titleStr = "Image",
+std::string xLabel = "X",
+std::string yLabel = "Y") {
+    // Zamień na wektor podwójny do matplot++
+    int H = (int)image.size();
+    int W = H ? (int)image[0].size() : 0;
+    imagesc(image);
+    title(titleStr);
+    xlabel(xLabel);
+    ylabel(yLabel);
+    colorbar();
+    show();
+}
+
 PYBIND11_MODULE(_core, m) {
     m.doc() = R"pbdoc(
         Pybind11 example plugin
@@ -207,6 +286,25 @@ PYBIND11_MODULE(_core, m) {
         py::arg("plotTitle") = "Signal",
         py::arg("xLabel") = "X",
         py::arg("yLabel") = "Y");
+
+    m.def("filter1D", &filter1D,
+    "1D convolution of signal with kernel",
+    py::arg("signal"),
+    py::arg("kernel"),
+    py::arg("circular") = false);
+
+    m.def("filter2D", &filter2D,
+    "2D convolution of image with kernel",
+    py::arg("image"),
+    py::arg("kernel"),
+    py::arg("circular") = false);
+
+    m.def("showImage", &showImage,
+    "Show 2D matrix as image",
+    py::arg("image"),
+    py::arg("title") = "Image",
+    py::arg("xLabel") = "X",
+    py::arg("yLabel") = "Y");
 
     m.attr("__version__") = "dev";
 // #ifdef VERSION_INFO
