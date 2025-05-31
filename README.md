@@ -1,6 +1,9 @@
 # Techniki Programowania - projekt 3
 Projekt polega na zbudowaniu biblioteki w c++ do przetwarzania sygnałów. Biblioteka ma być udostępniona jako moduł pythonowy przy użyciu biblioteki pybind11.
 
+## Menu
+[Raport / Sprawozdanie](./raport/README.md)
+
 ## Zależności
 W celu realizacji projektu należy przygotować środowisko pracy. Niezbędne będą:
 1. CMake
