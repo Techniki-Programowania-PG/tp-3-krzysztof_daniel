@@ -65,7 +65,7 @@ filtered_image = sa.filter2D(image_2d, kernel2d)
 sa.showComplexSignal(filtered_image, 500, "title", 'x', "Y")
 
 # === Show images ===
-print(image_2d)
+#print(image_2d)
 
 sa.showImage(image0, title="Image from DFT")
 sa.showImage(image_2d, title="Image from 1D Filtered Signal")

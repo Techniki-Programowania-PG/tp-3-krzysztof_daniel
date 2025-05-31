@@ -6,10 +6,11 @@ build-backend = "scikit_build_core.build"
 [project]
 name = "signal_analyzer"
 version = "0.0.1"
-description="A minimal example package (with pybind11)"
+description="Signal analyzer (with pybind11)"
 #readme = "README.md"
 authors = [
-  { name = "My Name", email = "me@email.com" },
+  { name = "Daniel Chrzanowski 203381"},
+  { name = "Krzysztof Chojka 203183"}
 ]
 requires-python = ">=3.9"
 

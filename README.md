@@ -58,10 +58,10 @@ git clone https://github.com/pybind/scikit_build_example
 
 ## Zadanie projektowe
 Podstawowe funkcjonalności do zaimplementowania:
-1. Wizualizacja sygnału z wykorzystaniem biblioteki [matplotplusplus](https://github.com/alandefreitas/matplotplusplus) - funkcja showSignal()
-2. [DFT](https://en.wikipedia.org/wiki/Discrete_Fourier_transform) i transformata odwrotna - funckja DFT()
+1. Wizualizacja sygnału z wykorzystaniem biblioteki [matplotplusplus](https://github.com/alandefreitas/matplotplusplus)
+2. [DFT](https://en.wikipedia.org/wiki/Discrete_Fourier_transform) i transformata odwrotna
 3. [Filtracja 1D i 2D](https://docs.scipy.org/doc/scipy/tutorial/signal.html#filtering)
-4. Generowanie sygnałów o zadanej częstotliwości (sin, cos, prostokątny, piłokształtny) - funkcja generate_signal()
+4. Generowanie sygnałów o zadanej częstotliwości (sin, cos, prostokątny, piłokształtny)
 
 Dodatkowo:
 1. [Pochodna sygnału](https://en.wikipedia.org/wiki/Finite_difference)
