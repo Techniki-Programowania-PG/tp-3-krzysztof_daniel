@@ -49,3 +49,4 @@ Poniżej krótki przegląd; pełna dokumentacja funkcji i sygnatur w [./API.md](
 - `filter1D(signal, kernel, circular=False)`: konwolucja 1D
 - `filter2D(image, kernel, circular=False)`: konwolucja 2D
 - `showSimpleSignal(x, y)`, `showComplexSignal(...)`, `showImage(...)`: wizualizacje
+- `generateGaussianKernel1D(size, sigma)`, `generateGaussianKernel2D(size, sigma)`: generowanie kernelu Gaussa

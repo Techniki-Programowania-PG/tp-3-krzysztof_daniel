@@ -225,6 +225,47 @@ bool circular = false)
     return out;
 }
 
+std::vector<double> generateGaussianKernel1D(int size, double sigma) {
+    std::vector<double> kernel(size);
+    int half = size / 2;
+    double sum = 0.0;
+
+    for (int i = 0; i < size; ++i) {
+        int x = i - half;
+        kernel[i] = std::exp(-(x * x) / (2 * sigma * sigma));
+        sum += kernel[i];
+    }
+
+    // Normalizacja
+    for (double& val : kernel)
+        val /= sum;
+
+    return kernel;
+}
+
+std::vector<std::vector<double>> generateGaussianKernel2D(int size, double sigma) {
+    std::vector<std::vector<double>> kernel(size, std::vector<double>(size));
+    int half = size / 2;
+    double sum = 0.0;
+
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            int x = i - half;
+            int y = j - half;
+            kernel[i][j] = std::exp(-(x*x + y*y) / (2 * sigma * sigma));
+            sum += kernel[i][j];
+        }
+    }
+
+    // Normalizacja
+    for (auto& row : kernel)
+        for (double& val : row)
+            val /= sum;
+
+    return kernel;
+}
+
+
 // Wizualizacja macierzy 2D
 void showImage(const std::vector<std::vector<double>>& image,
 std::string titleStr = "Image",
@@ -305,6 +346,17 @@ PYBIND11_MODULE(_core, m) {
     py::arg("title") = "Image",
     py::arg("xLabel") = "X",
     py::arg("yLabel") = "Y");
+
+    m.def("generateGaussianKernel2D", &generateGaussianKernel2D,
+        "Generate Gaussian Kernel 2D",
+        py::arg("size"),
+        py::arg("sigma"));
+
+        
+    m.def("generateGaussianKernel1D", &generateGaussianKernel1D,
+        "Generate Gaussian Kernel 1D",
+        py::arg("size"),
+        py::arg("sigma"));
 
     m.attr("__version__") = "dev";
 // #ifdef VERSION_INFO
