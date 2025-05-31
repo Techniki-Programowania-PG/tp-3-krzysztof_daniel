@@ -2,7 +2,9 @@
 Projekt polega na zbudowaniu biblioteki w c++ do przetwarzania sygnałów. Biblioteka ma być udostępniona jako moduł pythonowy przy użyciu biblioteki pybind11.
 
 ## Menu
-[Raport / Sprawozdanie](./raport/README.md)
+[Dokumentacja](./raport/README.md)
+
+[Oddanie projektu](./raport/oddanie_projektu.ipynb)
 
 ## Zależności
 W celu realizacji projektu należy przygotować środowisko pracy. Niezbędne będą:

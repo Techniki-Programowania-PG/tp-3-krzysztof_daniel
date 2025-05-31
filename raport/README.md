@@ -11,6 +11,8 @@ Signal Analyzer to biblioteka do Pythona napisna w C++, służąca do:
 ## Menu
 [Strona główna](../README.md)
 
+[Oddanie projektu](./oddanie_projektu.ipynb)
+
 
 
 ## Spis treści
