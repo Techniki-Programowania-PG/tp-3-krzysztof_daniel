@@ -35,6 +35,7 @@ Signal Analyzer to biblioteka do Pythona napisna w C++, służąca do:
 - pybind11
 - Matplot++ (pobierane automatycznie przez CMake)
 - (opcjonalnie) numpy, scipy do testów
+- Wszystkie wymagane i opcjonalne biblioteki do pythona znajdują się w pliku requirements.txt
 
 ---
 
