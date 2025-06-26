@@ -1,11 +1,36 @@
-# Kompilowanie programu
+# Projekt 4 - ramię robota
+
+>*Krzysztof&nbsp;Chojka&nbsp;203183, Daniel&nbsp;Chrzanowski&nbsp;203381* **ACIR&nbsp;1B**
+
+## Opis sterowania programem
+
+**Tryb manualny:**
+- Strzałki `▲ ▼ ◄ ►` – sterowanie ramionami robota
+- Klawisz `P` – podniesienie klocka
+- Klawisz `O` – odłożenie klocka w aktualnej pozycji końcówki ramienia
+- Klawisz `R` – rozpoczęcie/zakończenie nagrywania ruchów ramienia
+- Klawisz `F` – odtwarzanie nagranych ruchów (automatyczne wykonanie zapamiętanej sekwencji)
+
+**Tryb automatyczny oraz obsługa GUI:**
+- Przycisk `Wieża 6` – zbuduj automatycznie wieżę z 6 klocków
+- Przycisk `Wieża 3` – automatyczne przeniesienie 3 klocków
+- Przycisk `Waga +` / `Waga -` – zmiana domyślnej masy nowego klocka
+- Przycisk `Rozmiar +` / `Rozmiar -` – zmiana domyślnego rozmiaru nowego klocka
+- Przycisk `Dodaj Kwadrat` / `Dodaj Koło` / `Dodaj Prostokąt` / `Dodaj Trójkąt` – dodanie nowego klocka wybranego kształtu na planszę
+- Przycisk `Wyczyść` – usuń wszystkie klocki
+
+**Obsługa błędów i ograniczeń:**
+- Program wyświetla komunikaty, gdy blok jest za ciężki lub za lekki, lub gdy próbujemy podnieść kolejny klocek, mając już jeden podniesiony.
+- Nie można ustawić wieży o wysokości większej niż zasięg ramienia.
+
+## Kompilowanie programu
 ```
 cmake -S . -B build
 cmake --build build
 .\build\RobotArmSim.exe
 ```
 
-# Wymagania ⬜ / ✅
+## Wymagania ⬜ / ✅
 
 ✅ Z wykorzystaniem ramienia robota zbuduj wieżę złożoną z 6 ustawionych na sobie klocków (kształt klocka - kwadrat).  
 ✅Z wykorzystaniem ramienia robota zbuduj wieżę złożoną z 6 ustawionych na sobie klocków (kształt klocka - koło).  
@@ -19,7 +44,7 @@ cmake --build build
 ⬜ Robot ma dostępny zbiór 4 elementów o różnej masie. Na podstawie tej informacji ustawia elementy w kolejności od najcięższego do najlżejszego.  
 ⬜ Robot ma dostępny zbiór 4 elementów o różnej masie. Na podstawie tej informacji ustawia elementy w kolejności od najlżejszego do najcięższego.  
 
-# TODO:
+## TODO:
 - ~~Dopisać komunikat dla zbyt lekkiego bloczka~~
 - Zamiast wyświetlać numer bloczka, wyświetlać na nim jego masę
 - ~~Uniemożliwić podniesienie bloczka jeśli już jakiś bloczek jest podniesiony~~
