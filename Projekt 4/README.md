@@ -46,7 +46,7 @@ cmake --build build
 
 ## TODO:
 - ~~Dopisać komunikat dla zbyt lekkiego bloczka~~
-- Zamiast wyświetlać numer bloczka, wyświetlać na nim jego masę
+- ~~Zamiast wyświetlać numer bloczka, wyświetlać na nim jego masę~~
 - ~~Uniemożliwić podniesienie bloczka jeśli już jakiś bloczek jest podniesiony~~
 - Dodać zabezpieczenie przy generowaniu klocków, żeby nie ustawiło wyższej wierzy niż zasięg ramienia
 - ~~Dodać obsługę błędu gdy R1Target wyrzuci pozycje (-1) (Używane w funkcji: moveToTarget())- Podano błędne ID bloku~~
